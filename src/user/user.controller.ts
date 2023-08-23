@@ -12,6 +12,7 @@ import { CreateUserDto } from '../dto/create-user-dto';
 import { Response as Res } from 'express';
 import redis from 'src/database/redis';
 import { ValidationPipe } from 'src/validation/validation.pipe';
+import { GetUserDto } from 'src/dto/get-user-dto';
 
 @Controller('pessoas')
 export class UserController {
@@ -30,7 +31,7 @@ export class UserController {
   }
 
   @Get(':id')
-  async findUnique(@Param('id') id: string) {
+  async findUnique(@Param('id') id: GetUserDto) {
     return this.userService.findUnique(id);
   }
 

@@ -2,6 +2,7 @@ import { Body, HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateUserDto } from '../dto/create-user-dto';
 import { randomUUID } from 'crypto';
 import poolPostgres from 'src/database/pg';
+import { GetUserDto } from 'src/dto/get-user-dto';
 
 @Injectable()
 export class UserService {
@@ -66,7 +67,7 @@ export class UserService {
     return user;
   }
 
-  async findUnique(id: string) {
+  async findUnique(id: GetUserDto) {
     if (!id) return {};
 
     const user = await poolPostgres.query(
@@ -79,7 +80,8 @@ export class UserService {
   }
 
   async findTerm(term: string) {
-    if (!term) return [];
+    if (!term)
+      throw new HttpException('Param t not passed', HttpStatus.BAD_REQUEST);
 
     const termNormalized = decodeURIComponent(term)
       .normalize('NFD')
