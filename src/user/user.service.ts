@@ -11,7 +11,7 @@ export class UserService {
   ) {
     if (!apelido || !nome || !nascimento) {
       throw new HttpException(
-        `${nascimento} is format invalid, only accept AAAA-MM-DD`,
+        'Missing parameters required',
         HttpStatus.UNPROCESSABLE_ENTITY,
       );
     }
