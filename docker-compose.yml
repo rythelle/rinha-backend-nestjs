@@ -27,8 +27,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.25'
-          memory: '0.20GB'
+          cpus: '0.3'
+          memory: '0.5GB'
 
   api2:
     build: .
@@ -56,8 +56,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.25'
-          memory: '0.20GB'
+          cpus: '0.3'
+          memory: '0.5GB'
 
   nginx:
     image: nginx:latest
@@ -82,7 +82,7 @@ services:
       resources:
         limits:
           cpus: '0.2'
-          memory: '0.85GB'
+          memory: '0.5GB'
 
   db:
     image: 'postgres:latest'
@@ -98,8 +98,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.3'
-          memory: '1.25GB'
+          cpus: '0.2'
+          memory: '1.5GB'
 
 volumes:
   nodemodules: {}
