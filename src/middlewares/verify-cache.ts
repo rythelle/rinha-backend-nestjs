@@ -4,14 +4,18 @@ import {
   Injectable,
   NestMiddleware,
 } from '@nestjs/common';
-import { Request, Response, NextFunction } from 'express';
 import redis from 'src/database/redis';
+import { Request, Response, NextFunction } from 'express';
+
+interface IParams {
+  t: string;
+}
 
 @Injectable()
 export class VerifyCacheMiddleware implements NestMiddleware {
   use(req: Request, res: Response, next: NextFunction) {
-    const { id } = req.params;
-    const { t } = req.query;
+    const [, , id] = req.originalUrl.split('/');
+    const { t } = JSON.parse(JSON.stringify(req.query)) as IParams;
 
     if (t) return next();
 

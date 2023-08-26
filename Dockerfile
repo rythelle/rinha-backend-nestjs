@@ -4,7 +4,7 @@ WORKDIR /usr/src/app
 
 COPY package*.json ./
 
-RUN npm i --silent
+RUN npm ci --silent
 
 COPY . .
 

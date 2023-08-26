@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from '../dto/create-user-dto';
-import { Response as Res } from 'express';
+import type { FastifyReply } from 'fastify';
 import redis from 'src/database/redis';
 import { ValidationPipe } from 'src/validation/validation.pipe';
 import { GetUserDto } from 'src/dto/get-user-dto';
@@ -21,13 +21,13 @@ export class UserController {
   @Post()
   async create(
     @Body(new ValidationPipe()) createUserDto: CreateUserDto,
-    @Response() res: Res,
+    @Response() reply: FastifyReply,
   ) {
     const user = await this.userService.create(createUserDto);
 
     redis.set(user.id, JSON.stringify(user), 'EX', 360);
 
-    return res.set({ Location: `/pessoas/${user.id}` }).json(user);
+    return reply.header('Location', `/pessoas/${user.id}`).send(user);
   }
 
   @Get(':id')

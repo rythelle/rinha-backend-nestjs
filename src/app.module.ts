@@ -2,6 +2,7 @@ import {
   MiddlewareConsumer,
   Module,
   NestModule,
+  RequestMethod,
   ValidationPipe,
 } from '@nestjs/common';
 import { UserService } from './user/user.service';
@@ -24,6 +25,8 @@ import { APP_PIPE } from '@nestjs/core';
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(VerifyCacheMiddleware).forRoutes('/pessoas/:id');
+    consumer
+      .apply(VerifyCacheMiddleware)
+      .forRoutes({ path: '*', method: RequestMethod.ALL });
   }
 }

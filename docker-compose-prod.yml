@@ -2,17 +2,14 @@ version: '3.5'
 
 services:
   api1:
-    build: .
-    image: api
+    image: redvelvetdev/app:latest
     hostname: api1
+    restart: always
     depends_on:
       - db
       - redis
     expose:
       - '80'
-    volumes:
-      - ./dist:/usr/src/app/dist
-      - nodemodules:/src/node_modules
     links:
       - db
       - redis
@@ -28,20 +25,17 @@ services:
       resources:
         limits:
           cpus: '0.3'
-          memory: '0.7GB'
+          memory: '0.5GB'
 
   api2:
-    build: .
-    image: api
+    image: redvelvetdev/app:latest
     hostname: api2
+    restart: always
     depends_on:
       - db
       - redis
     expose:
       - '80'
-    volumes:
-      - ./dist:/app/dist
-      - nodemodules:/src/node_modules
     links:
       - db
       - redis
@@ -57,7 +51,7 @@ services:
       resources:
         limits:
           cpus: '0.3'
-          memory: '0.7GB'
+          memory: '0.5GB'
 
   nginx:
     image: nginx:latest
@@ -72,7 +66,7 @@ services:
       resources:
         limits:
           cpus: '0.5'
-          memory: '0.4GB'
+          memory: '0.3GB'
 
   redis:
     image: redis:latest
@@ -82,7 +76,7 @@ services:
       resources:
         limits:
           cpus: '0.2'
-          memory: '0.4GB'
+          memory: '0.3GB'
 
   db:
     image: 'postgres:latest'
@@ -100,6 +94,3 @@ services:
         limits:
           cpus: '0.2'
           memory: '1.4GB'
-
-volumes:
-  nodemodules: {}

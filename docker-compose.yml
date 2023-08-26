@@ -2,14 +2,20 @@ version: '3.5'
 
 services:
   api1:
-    image: redvelvetdev/app:latest
+    build:
+      dockerfile: Dockerfile
+      context: .
+    image: api
     hostname: api1
-    restart: always
     depends_on:
-      - db
-      - redis
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     expose:
       - '80'
+    volumes:
+      - .:/usr/src/app
     links:
       - db
       - redis
@@ -21,21 +27,28 @@ services:
       POSTGRES_PORT: 5432
       REDIS_HOST: redis
       REDIS_PORT: 6379
+    # command: npm run start:dev
     deploy:
       resources:
         limits:
-          cpus: '0.3'
-          memory: '0.5GB'
+          cpus: '0.375'
+          memory: '1GB'
 
   api2:
-    image: redvelvetdev/app:latest
-    hostname: api2
-    restart: always
+    build:
+      dockerfile: Dockerfile
+      context: .
+    image: api
+    hostname: api1
     depends_on:
-      - db
-      - redis
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     expose:
       - '80'
+    volumes:
+      - .:/usr/src/app
     links:
       - db
       - redis
@@ -47,11 +60,12 @@ services:
       POSTGRES_PORT: 5432
       REDIS_HOST: redis
       REDIS_PORT: 6379
+    # command: npm run start:dev
     deploy:
       resources:
         limits:
-          cpus: '0.3'
-          memory: '0.5GB'
+          cpus: '0.375'
+          memory: '1GB'
 
   nginx:
     image: nginx:latest
@@ -66,22 +80,35 @@ services:
       resources:
         limits:
           cpus: '0.5'
-          memory: '0.3GB'
+          memory: '0.5GB'
 
   redis:
     image: redis:latest
     ports:
       - '6379:6379'
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 3s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - redis:/data
     deploy:
       resources:
         limits:
-          cpus: '0.2'
-          memory: '0.3GB'
+          cpus: '0.05'
+          memory: '0.4GB'
 
   db:
     image: 'postgres:latest'
     ports:
       - '5432:5432'
+    restart: always
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready" ]
+      interval: 3s
+      timeout: 5s
+      retries: 10
     environment:
       POSTGRES_USER: cake
       POSTGRES_PASSWORD: cake123
@@ -93,4 +120,8 @@ services:
       resources:
         limits:
           cpus: '0.2'
-          memory: '1.4GB'
+          memory: '1GB'
+
+volumes:
+  redis:
+    driver: local
