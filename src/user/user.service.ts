@@ -2,6 +2,7 @@ import { Body, HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateUserDto } from '../dto/create-user-dto';
 import { randomUUID } from 'crypto';
 import poolPostgres from 'src/database/pg';
+import { GetTermDto } from 'src/dto/get-term-dto';
 import { GetUserDto } from 'src/dto/get-user-dto';
 
 @Injectable()
@@ -55,11 +56,17 @@ export class UserService {
 
     try {
       await poolPostgres.query(
-        `INSERT INTO PEOPLE (ID, APELIDO, NOME, NASCIMENTO, STACK) VALUES ('${uniqueId}', '${apelido}', '${nome}', '${nascimento}', '{${stack}}')`,
+        `INSERT INTO PEOPLE (ID, APELIDO, NOME, NASCIMENTO, STACK) VALUES ('${uniqueId}', '${apelidoNormalized}', '${nomeNormalized}', '${nascimento}', '{${stackNormalized}}')`,
       );
-    } catch (error) {
-      if (error.code === '22008')
+    } catch (error: any) {
+      if (error.code === '22008') {
         throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+      } else if (error.code === '23505') {
+        throw new HttpException(
+          `${apelidoNormalized} already exists in database`,
+          HttpStatus.UNPROCESSABLE_ENTITY,
+        );
+      }
 
       throw new HttpException(error.message, HttpStatus.UNPROCESSABLE_ENTITY);
     }
@@ -67,23 +74,22 @@ export class UserService {
     return user;
   }
 
-  async findUnique(id: GetUserDto) {
-    if (!id) return {};
-
+  async findUnique({ id }: GetUserDto) {
     const user = await poolPostgres.query(
       `SELECT ID, APELIDO, NOME, NASCIMENTO, STACK FROM PEOPLE WHERE ID = '${id}'`,
     );
 
-    if (user.rows.length <= 0) return {};
+    if (user.rows.length <= 0)
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
 
     return user.rows[0];
   }
 
-  async findTerm(term: string) {
-    if (!term)
+  async findTerm({ t }: GetTermDto) {
+    if (!t)
       throw new HttpException('Param t not passed', HttpStatus.BAD_REQUEST);
 
-    const termNormalized = decodeURIComponent(term)
+    const termNormalized = decodeURIComponent(t)
       .normalize('NFD')
       .replace(/[\u0300-\u036f]/g, '')
       .toLowerCase();

@@ -7,6 +7,12 @@ services:
       context: .
     image: api
     hostname: api1
+    restart: "on-failure"
+    # healthcheck:
+    #   test: ["CMD-SHELL", "curl", "-f", "http://localhost:3002/healthy-check"]
+    #   interval: 10s
+    #   timeout: 5s
+    #   retries: 10
     depends_on:
       db:
         condition: service_healthy
@@ -14,8 +20,8 @@ services:
         condition: service_healthy
     expose:
       - '80'
-    volumes:
-      - .:/usr/src/app
+    # volumes:
+    #   - .:/usr/src/app
     links:
       - db
       - redis
@@ -27,12 +33,12 @@ services:
       POSTGRES_PORT: 5432
       REDIS_HOST: redis
       REDIS_PORT: 6379
-    # command: npm run start:dev
+    command: npm run start:prod
     deploy:
       resources:
         limits:
           cpus: '0.375'
-          memory: '1GB'
+          memory: '0.8GB'
 
   api2:
     build:
@@ -40,6 +46,12 @@ services:
       context: .
     image: api
     hostname: api1
+    restart: "on-failure"
+    # healthcheck:
+    #   test: ["CMD-SHELL", "curl", "-f", "http://localhost:3003/healthy-check"]
+    #   interval: 10s
+    #   timeout: 5s
+    #   retries: 10
     depends_on:
       db:
         condition: service_healthy
@@ -47,8 +59,8 @@ services:
         condition: service_healthy
     expose:
       - '80'
-    volumes:
-      - .:/usr/src/app
+    # volumes:
+    #   - .:/usr/src/app
     links:
       - db
       - redis
@@ -60,12 +72,12 @@ services:
       POSTGRES_PORT: 5432
       REDIS_HOST: redis
       REDIS_PORT: 6379
-    # command: npm run start:dev
+    command: npm run start:prod
     deploy:
       resources:
         limits:
           cpus: '0.375'
-          memory: '1GB'
+          memory: '0.8GB'
 
   nginx:
     image: nginx:latest
@@ -97,15 +109,19 @@ services:
       resources:
         limits:
           cpus: '0.05'
-          memory: '0.4GB'
+          memory: '0.2GB'
 
   db:
     image: 'postgres:latest'
     ports:
       - '5432:5432'
-    restart: always
+    restart: "on-failure"
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready" ]
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"
+        ]
       interval: 3s
       timeout: 5s
       retries: 10
@@ -120,7 +136,7 @@ services:
       resources:
         limits:
           cpus: '0.2'
-          memory: '1GB'
+          memory: '1.6GB'
 
 volumes:
   redis:

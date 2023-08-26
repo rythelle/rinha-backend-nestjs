@@ -11,8 +11,9 @@ import { UserService } from './user.service';
 import { CreateUserDto } from '../dto/create-user-dto';
 import type { FastifyReply } from 'fastify';
 import redis from 'src/database/redis';
-import { ValidationPipe } from 'src/validation/validation.pipe';
 import { GetUserDto } from 'src/dto/get-user-dto';
+import { GetTermDto } from 'src/dto/get-term-dto';
+import { ValidationPipe } from 'src/validation/validation.pipe';
 
 @Controller('pessoas')
 export class UserController {
@@ -21,22 +22,22 @@ export class UserController {
   @Post()
   async create(
     @Body(new ValidationPipe()) createUserDto: CreateUserDto,
-    @Response() reply: FastifyReply,
+    @Response() res: FastifyReply,
   ) {
     const user = await this.userService.create(createUserDto);
 
     redis.set(user.id, JSON.stringify(user), 'EX', 360);
 
-    return reply.header('Location', `/pessoas/${user.id}`).send(user);
+    return res.header('Location', `/pessoas/${user.id}`).send(user);
   }
 
   @Get(':id')
-  async findUnique(@Param('id') id: GetUserDto) {
-    return this.userService.findUnique(id);
+  async findUnique(@Param() params: GetUserDto) {
+    return this.userService.findUnique(params);
   }
 
   @Get()
-  async findTerm(@Query('t') term: string) {
-    return this.userService.findTerm(term);
+  async findTerm(@Query() queryParams: GetTermDto) {
+    return this.userService.findTerm(queryParams);
   }
 }

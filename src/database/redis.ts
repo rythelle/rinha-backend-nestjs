@@ -5,4 +5,9 @@ const redis = new Redis({
   host: process.env.REDIS_HOST,
 });
 
+// const redis = new Redis({
+//   port: 6379,
+//   host: 'localhost',
+// });
+
 export default redis;

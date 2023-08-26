@@ -5,7 +5,7 @@ import {
   NestMiddleware,
 } from '@nestjs/common';
 import redis from 'src/database/redis';
-import { Request, Response, NextFunction } from 'express';
+import { FastifyRequest, FastifyReply } from 'fastify';
 
 interface IParams {
   t: string;
@@ -13,9 +13,11 @@ interface IParams {
 
 @Injectable()
 export class VerifyCacheMiddleware implements NestMiddleware {
-  use(req: Request, res: Response, next: NextFunction) {
+  use(req: FastifyRequest, res: FastifyReply['raw'], next: () => void) {
     const [, , id] = req.originalUrl.split('/');
     const { t } = JSON.parse(JSON.stringify(req.query)) as IParams;
+
+    // if (route === 'healthy-check') return next();
 
     if (t) return next();
 
@@ -23,7 +25,7 @@ export class VerifyCacheMiddleware implements NestMiddleware {
       if (err) throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR);
 
       if (value !== null) {
-        res.writeHead(200, { 'content-type': 'application/json' });
+        res.writeHead(200, { 'Content-type': 'application/json' });
 
         res.write(JSON.stringify(JSON.parse(value.toString())));
 
