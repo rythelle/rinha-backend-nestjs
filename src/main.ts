@@ -4,6 +4,7 @@ import {
   FastifyAdapter,
   NestFastifyApplication,
 } from '@nestjs/platform-fastify';
+import { ClusterService } from './libs/cluster.service';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
@@ -13,4 +14,5 @@ async function bootstrap() {
 
   await app.listen(80, '0.0.0.0');
 }
-bootstrap();
+
+ClusterService.register(4, bootstrap);
