@@ -1,19 +1,23 @@
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const cluster = require('cluster');
+
 import { Injectable } from '@nestjs/common';
 
-import cluster from 'cluster';
 import * as process from 'node:process';
 import * as os from 'os';
 
 @Injectable()
 export class ClusterService {
-  static register(workers: number, callback: any): void {
-    const numCPUs = os.cpus().length;
+  static register(workers: number, bootstrap: any): void {
+    const numCPUs = Math.ceil(os.cpus().length / 2);
 
-    if (cluster?.isPrimary) {
-      console.log(`Master server started on ${process.pid}`);
+    process.env.UV_THREADPOOL_SIZE = String(numCPUs);
+
+    if (cluster.isPrimary) {
+      console.log(`[Cluster] Master server started on ${process.pid}`);
 
       process.on('SIGINT', () => {
-        console.log('Cluster shutting down...');
+        console.log('[Cluster] Cluster shutting down');
         for (const id in cluster.workers) {
           cluster.workers[id].kill();
         }
@@ -28,16 +32,16 @@ export class ClusterService {
       }
 
       cluster.on('online', (worker) => {
-        console.log('Worker %s is online', worker.process.pid);
+        console.log('[Cluster] Worker %s is online', worker.process.pid);
       });
 
       cluster.on('exit', (worker) => {
-        console.log(`Worker ${worker.process.pid} died. Restarting`);
+        console.log(`[Cluster] Worker ${worker.process.pid} died. Restarting`);
 
         cluster.fork();
       });
     } else {
-      callback();
+      bootstrap();
     }
   }
 }

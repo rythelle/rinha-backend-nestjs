@@ -13,6 +13,7 @@ import { APP_PIPE } from '@nestjs/core';
 import { ValidationPipe } from './validation/validation.pipe';
 import { HealthyCheckController } from './healthy-check/healthy-check.controller';
 import { HealthyCheckService } from './healthy-check/healthy-check.service';
+import { ClusterService } from './libs/cluster.service';
 
 @Module({
   controllers: [UserController, CountUserController, HealthyCheckController],
@@ -20,6 +21,7 @@ import { HealthyCheckService } from './healthy-check/healthy-check.service';
     UserService,
     CountUserService,
     HealthyCheckService,
+    ClusterService,
     {
       provide: APP_PIPE,
       useClass: ValidationPipe,

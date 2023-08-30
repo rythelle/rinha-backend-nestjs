@@ -9,7 +9,11 @@ import { ClusterService } from './libs/cluster.service';
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
     AppModule,
-    new FastifyAdapter(),
+    new FastifyAdapter({
+      connectionTimeout: 10000,
+      requestTimeout: 15000,
+      keepAliveTimeout: 15000,
+    }),
   );
 
   await app.listen(80, '0.0.0.0');
