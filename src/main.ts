@@ -10,9 +10,9 @@ async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
     AppModule,
     new FastifyAdapter({
-      connectionTimeout: 10000,
-      requestTimeout: 15000,
-      keepAliveTimeout: 15000,
+      connectionTimeout: 25000,
+      requestTimeout: 30000,
+      keepAliveTimeout: 30000,
     }),
   );
 

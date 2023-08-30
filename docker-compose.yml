@@ -37,8 +37,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.375'
-          memory: '0.8GB'
+          cpus: '0.3'
+          memory: '0.425GB'
 
   api2:
     build:
@@ -76,8 +76,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.375'
-          memory: '0.8GB'
+          cpus: '0.3'
+          memory: '0.425GB'
 
   nginx:
     image: nginx:latest
@@ -92,7 +92,7 @@ services:
       resources:
         limits:
           cpus: '0.3'
-          memory: '0.5GB'
+          memory: '0.45GB'
 
   redis:
     image: redis:latest
@@ -131,12 +131,12 @@ services:
       POSTGRES_DB: db_cake
     volumes:
       - ./init-database.sql:/docker-entrypoint-initdb.d/init-database.sql
-    command: postgres -c 'max_connections=10000'
+    command: postgres -c 'max_connections=6000'
     deploy:
       resources:
         limits:
-          cpus: '0.4'
-          memory: '1.6GB'
+          cpus: '0.55'
+          memory: '1.5GB'
 
 volumes:
   redis:
